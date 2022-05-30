@@ -26,4 +26,12 @@ class TicketCatalogueServiceImpl: TicketCatalogueService {
     override fun getAllOrders(): Flow<Order> {
         return orderRepository.findAllOrders()
     }
+
+    override fun getAllUserOrders(username: String): Flow<Order> {
+        return orderRepository.findAllUserOrders(username)
+    }
+
+    override suspend fun getUserOrder(username: String, orderId: Long): Order? {
+        return orderRepository.findUserOrderById(username, orderId)
+    }
 }

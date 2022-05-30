@@ -8,4 +8,6 @@ import kotlinx.coroutines.flow.Flow
 interface TicketCatalogueService {
     fun getAllTickets(): Flow<Ticket>
     fun getAllOrders(): Flow<Order>
+    fun getAllUserOrders(username: String): Flow<Order>
+    suspend fun getUserOrder(username: String, orderId: Long): Order?
 }

@@ -23,3 +23,5 @@ INSERT INTO ticket_catalogue VALUES (4, 1.51, 'ordinal', 'Zone 4');
 INSERT INTO ticket_catalogue VALUES (5, 36.52, 'ordinal', 'Zone 3');
 INSERT INTO ticket_catalogue VALUES (6, 65.53, 'over 60', 'Zone 2');
 INSERT INTO orders VALUES (1, 5, 'PENDING', 'MarioRossi', 1);
+INSERT INTO orders VALUES (2, 3, 'PENDING', 'JohnDoe', 2);
+INSERT INTO orders VALUES (3, 1, 'PENDING', 'MarioRossi', 3);
