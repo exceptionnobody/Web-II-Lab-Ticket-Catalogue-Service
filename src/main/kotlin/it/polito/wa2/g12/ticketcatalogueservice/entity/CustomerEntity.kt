@@ -1,13 +1,16 @@
 package it.polito.wa2.g12.ticketcatalogueservice.repository
 
 import org.springframework.data.annotation.Id
-import org.springframework.data.r2dbc.repository.R2dbcRepository
+import org.springframework.data.relational.core.mapping.Column
 import org.springframework.data.relational.core.mapping.Table
 
 @Table(name ="customer")
 class CustomerEntity(
-    @Id
-    var id: Long? = null,
+    @Column
     val firstName: String? = null,
+    @Column
     val lastName: String? = null,
-)
+) {
+    @Id
+    var id: Int?  = null
+}
