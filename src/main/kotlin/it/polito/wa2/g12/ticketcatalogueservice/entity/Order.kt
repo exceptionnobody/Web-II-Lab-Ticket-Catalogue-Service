@@ -1,20 +1,23 @@
 package it.polito.wa2.g12.ticketcatalogueservice.entity
 
+import it.polito.wa2.g12.ticketcatalogueservice.dto.OrderDTO
 import org.springframework.data.annotation.Id
 import org.springframework.data.relational.core.mapping.Column
 import org.springframework.data.relational.core.mapping.Table
 
-@Table
-class TicketCatalogue(
+@Table("orders")
+class Order(
     @Column
-    var price: Double,
+    var quantity: Int,
     @Column
-    var ticket_type: String,
+    var status: String,
     @Column
-    var zone: String
+    var username: String,
+    @Column
+    var ticketId: Long
 ) {
     @Id
     var id: Long? = null
 }
 
-fun TicketCatalogue.toDTO() = TicketCatalogue(price, ticket_type, zone)
+fun Order.toDTO() = OrderDTO(quantity, status, username, ticketId)
