@@ -1,7 +1,6 @@
 package it.polito.wa2.g12.ticketcatalogueservice.config
 
 
-import it.polito.wa2.g12.ticketcatalogueservice.kafka.Billing
 import it.polito.wa2.g12.ticketcatalogueservice.kafka.BillingSerializer
 import org.apache.kafka.clients.producer.ProducerConfig
 import org.apache.kafka.common.serialization.StringSerializer
