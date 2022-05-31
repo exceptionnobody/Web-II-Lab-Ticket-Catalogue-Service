@@ -7,7 +7,7 @@ plugins {
     kotlin("plugin.spring") version "1.6.21"
 }
 
-group = "it.test"
+group = "it.polito.wa2.g12"
 version = "0.0.1-SNAPSHOT"
 java.sourceCompatibility = JavaVersion.VERSION_17
 
