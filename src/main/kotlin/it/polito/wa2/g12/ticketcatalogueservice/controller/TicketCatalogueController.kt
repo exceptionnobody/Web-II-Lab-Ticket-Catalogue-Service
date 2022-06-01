@@ -1,10 +1,8 @@
 package it.polito.wa2.g12.ticketcatalogueservice.controller
 
-import it.polito.wa2.g12.ticketcatalogueservice.dto.OrderDTO
-import it.polito.wa2.g12.ticketcatalogueservice.dto.TicketDTO
 import it.polito.wa2.g12.ticketcatalogueservice.service.impl.PaymentInfo
 import it.polito.wa2.g12.ticketcatalogueservice.service.impl.TicketCatalogueServiceImpl
-import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.count
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.GetMapping
@@ -17,16 +15,20 @@ class TicketCatalogueController(val ticketCatalogueService: TicketCatalogueServi
     @GetMapping("/tickets")
     suspend fun getAllCustomers() : ResponseEntity<Any> {
         val res = ticketCatalogueService.getAllTickets()
-        return if (res != null) ResponseEntity(res, HttpStatus.OK)
-        else ResponseEntity("Ticket catalogue empty", HttpStatus.NOT_FOUND)
+        return if (res != null) {
+            if (res.count() != 0) ResponseEntity(res, HttpStatus.OK)
+            else ResponseEntity("Catalogue empty", HttpStatus.NOT_FOUND)
+        } else ResponseEntity("Error reading the catalogue", HttpStatus.BAD_REQUEST)
     }
 
     @GetMapping("/orders")
-    fun getAllUserOrders() : ResponseEntity<Any> {
+    suspend fun getAllUserOrders() : ResponseEntity<Any> {
         // TODO: extract customer username from the principal
         val res = ticketCatalogueService.getAllUserOrders("MarioRossi")
-        return if (res != null) ResponseEntity(res, HttpStatus.OK)
-        else ResponseEntity("No orders for the specified user", HttpStatus.NOT_FOUND)
+        return if (res != null) {
+            if (res.count() != 0) ResponseEntity(res, HttpStatus.OK)
+            else ResponseEntity("Order table empty", HttpStatus.NOT_FOUND)
+        } else ResponseEntity("Error reading orders", HttpStatus.BAD_REQUEST)
     }
 
     @GetMapping("/orders/{orderId}")
@@ -37,22 +39,26 @@ class TicketCatalogueController(val ticketCatalogueService: TicketCatalogueServi
     }
 
     @GetMapping("/admin/orders")
-    fun getAllOrders(): ResponseEntity<Any> {
+    suspend fun getAllOrders(): ResponseEntity<Any> {
         val res = ticketCatalogueService.getAllOrders()
-        return if (res != null) ResponseEntity(res, HttpStatus.OK)
-        else ResponseEntity("Order table empty", HttpStatus.NOT_FOUND)
+        return if (res != null) {
+            if (res.count() != 0) ResponseEntity(res, HttpStatus.OK)
+            else ResponseEntity("Order table empty", HttpStatus.NOT_FOUND)
+        } else ResponseEntity("Bad request", HttpStatus.BAD_REQUEST)
     }
 
     @GetMapping("/admin/orders/{userId}")
-    fun getAllUserOrders(@PathVariable userId: String): ResponseEntity<Any> {
+    suspend fun getAllUserOrders(@PathVariable userId: String): ResponseEntity<Any> {
         // TODO: we should save in the principal also the user id? IDK
         val res = ticketCatalogueService.getAllUserOrders(userId)
-        return if (res != null) ResponseEntity(res, HttpStatus.OK)
-        else ResponseEntity("No orders for the specified user", HttpStatus.NOT_FOUND)
+        return if (res != null) {
+            if (res.count() != 0) ResponseEntity(res, HttpStatus.OK)
+            else ResponseEntity("No orders for the specified user", HttpStatus.NOT_FOUND)
+        } else ResponseEntity("Bad request", HttpStatus.BAD_REQUEST)
     }
 
     @GetMapping("/toTravelerService")
-    suspend fun getUserdet(): Any {
+    suspend fun shopTickets(): Any {
         // TODO: we should save in the principal also the user id? IDK
         // Usually an Id is a Long and not a String
         return if (ticketCatalogueService.shopTickets("admin", 3, 2, PaymentInfo("cardNumber", "expiration", 0, "cardholder"),
