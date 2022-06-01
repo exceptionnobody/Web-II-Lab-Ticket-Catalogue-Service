@@ -1,4 +1,4 @@
-package it.polito.wa2.g12.ticketcatalogueservice.security;
+package it.polito.wa2.g12.ticketcatalogueservice.security
 
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
 import org.springframework.security.core.authority.SimpleGrantedAuthority

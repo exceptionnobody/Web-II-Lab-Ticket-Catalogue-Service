@@ -18,6 +18,7 @@ import org.springframework.web.reactive.function.client.awaitBody
 import java.time.LocalDate
 import kotlin.math.absoluteValue
 
+
 // TODO: use this guide to pass from webflux to coroutine
 // https://www.baeldung.com/kotlin/spring-boot-kotlin-coroutines
 
@@ -32,15 +33,15 @@ class TicketCatalogueServiceImpl: TicketCatalogueService {
     @Autowired
     lateinit var orderRepository: OrderRepository
 
-    override fun getAllTickets(): Flow<TicketDTO>? {
+    override fun getAllTickets(): Flow<TicketDTO> {
         return ticketRepository.findAllTickets().map { it.toDTO() }
     }
 
-    override fun getAllOrders(): Flow<OrderDTO>? {
+    override fun getAllOrders(): Flow<OrderDTO> {
         return orderRepository.findAllOrders().map { it.toDTO() }
     }
 
-    override fun getAllUserOrders(username: String): Flow<OrderDTO>? {
+    override fun getAllUserOrders(username: String): Flow<OrderDTO> {
         return orderRepository.findAllUserOrders(username).map { it.toDTO() }
     }
 
@@ -101,3 +102,52 @@ class TicketCatalogueServiceImpl: TicketCatalogueService {
         return true
     }
 }
+//
+//
+//@RestController
+//@RequestMapping("/students")
+//class StudentsController {
+//    @Autowired
+//    private val student_repository: Student_Repository? = null
+//    @PostMapping
+//    fun create(@RequestBody student: Student?): Mono<ResponseEntity<Student>> {
+//        return student_repository.save(student)
+//            .map { savedStudent -> ResponseEntity.ok(savedStudent) }
+//            .defaultIfEmpty(ResponseEntity.notFound().build())
+//    }
+//
+//    @get:GetMapping
+//    val students: Flux<Any>
+//        get() = student_repository.findAll()
+//
+//    @GetMapping("/{studentId}")
+//    fun getStudentById(@PathVariable studentId: Int): Mono<ResponseEntity<Student>> {
+//        return student_repository.findById(studentId)
+//            .map { student -> ResponseEntity.ok(student) }
+//            .defaultIfEmpty(ResponseEntity.notFound().build())
+//    }
+//
+//    @PutMapping("/{studentId}")
+//    fun updateStudent(@PathVariable studentId: Int, @RequestBody student: Student): Mono<*> {
+//        return student_repository.findById(studentId)
+//            .flatMap { selectedStudentFromDB ->
+//                selectedStudentFromDB.setName(student.getName())
+//                selectedStudentFromDB.setAge(student.getAge())
+//                selectedStudentFromDB.setUniversity(student.getUniversity())
+//                selectedStudentFromDB.setGpa(student.getGpa())
+//                student_repository.save(selectedStudentFromDB)
+//            }
+//            .map { updatedStudent -> ResponseEntity.ok(updatedStudent) }
+//            .defaultIfEmpty(ResponseEntity<T>(HttpStatus.NOT_FOUND))
+//    }
+//
+//    @DeleteMapping("/student/{id}")
+//    fun deleteStudent(@PathVariable(value = "id") studentId: Int): Mono<ResponseEntity<Void>> {
+//        return student_repository.findById(studentId)
+//            .flatMap { selectedStudentFromDB ->
+//                student_repository.delete(selectedStudentFromDB)
+//                    .then(Mono.just(ResponseEntity<Void>(HttpStatus.OK)))
+//            }
+//            .defaultIfEmpty(ResponseEntity<T>(HttpStatus.NOT_FOUND))
+//    }
+//}
