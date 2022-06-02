@@ -57,7 +57,8 @@ class TicketCatalogueServiceImpl: TicketCatalogueService {
                 t.zones,
                 t.minimum_age,
                 t.maximum_age,
-                t.duration
+                t.duration,
+                t.only_weekends
         )).toDTO()
     }
 
@@ -70,7 +71,7 @@ class TicketCatalogueServiceImpl: TicketCatalogueService {
         return age <= ticket.maximum_age && age >= ticket.minimum_age
     }
 
-    override suspend fun shopTickets(username: String, ticketdId: Long, quantity: Int, paymentInfo: PaymentInfoDTO, jwt: String): Boolean {
+    override suspend fun shopTickets(username: String, ticketdId: Long, quantity: Int, paymentInfo: PaymentCardDTO, jwt: String): Boolean {
         val ticket: TicketDTO? = ticketRepository.findById(ticketdId)?.toDTO()
         val response: UserProfileDTO = WebClient
             .create("http://localhost:8081")

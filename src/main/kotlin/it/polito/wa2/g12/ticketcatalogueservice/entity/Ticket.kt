@@ -18,10 +18,12 @@ class Ticket(
     @Column
     var maximum_age: Int,
     @Column
-    var duration: Int
+    var duration: Int,
+    @Column
+    var only_weekends: Boolean
 ) {
     @Id
     var id: Long? = null
 }
 
-fun Ticket.toDTO() = TicketDTO(id!!, price, ticket_type, zones, minimum_age, maximum_age, duration)
+fun Ticket.toDTO() = TicketDTO(id!!, price, ticket_type, zones, minimum_age, maximum_age, duration, only_weekends)

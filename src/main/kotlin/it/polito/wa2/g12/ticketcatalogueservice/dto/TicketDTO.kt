@@ -7,5 +7,6 @@ class TicketDTO(
     val zones: String,
     val minimum_age: Int,
     val maximum_age: Int,
-    val duration: Int
+    val duration: Int,
+    val only_weekends: Boolean
 )

@@ -1,7 +1,7 @@
 package it.polito.wa2.g12.ticketcatalogueservice.controller
 
 import it.polito.wa2.g12.ticketcatalogueservice.dto.OrderDTO
-import it.polito.wa2.g12.ticketcatalogueservice.dto.PaymentInfoDTO
+import it.polito.wa2.g12.ticketcatalogueservice.dto.PaymentCardDTO
 import it.polito.wa2.g12.ticketcatalogueservice.dto.TicketDTO
 import it.polito.wa2.g12.ticketcatalogueservice.service.impl.TicketCatalogueServiceImpl
 import kotlinx.coroutines.flow.Flow
@@ -43,7 +43,7 @@ class TicketCatalogueController(val ticketCatalogueService: TicketCatalogueServi
     }
 
     // Use a JSON like this one to test this endpoint:
-    // {"price":"20", "ticket_type":"ordinal", "zones":"XYZ", "minimum_age":18, "maximum_age":30, "duration":"24"}
+    // {"ticket_type":"ordinal","price":"20","zones":"XYZ","minimum_age":18,"maximum_age":30,"duration":"24","only_weekends":false}
     @PostMapping("/admin/tickets")
     @PreAuthorize("hasAnyAuthority('ADMIN')")
     suspend fun addNewTicket(@RequestBody ticket: TicketDTO): TicketDTO? {
@@ -66,7 +66,7 @@ class TicketCatalogueController(val ticketCatalogueService: TicketCatalogueServi
                     principal.name,
                     ticketId,
                     2,
-                    PaymentInfoDTO(
+                    PaymentCardDTO(
                         "cardNumber",
                         "expiration",
                         0,

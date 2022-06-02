@@ -8,7 +8,8 @@ CREATE TABLE IF NOT EXISTS ticket_catalogue (
     zones VARCHAR(255) NOT NULL,
     minimum_age INT NOT NULL,
     maximum_age INT NOT NULL,
-    duration INT NOT NULL
+    duration INT NOT NULL,
+    only_weekends BOOLEAN NOT NULL
 );
 
 CREATE TABLE IF NOT EXISTS orders (
@@ -19,14 +20,10 @@ CREATE TABLE IF NOT EXISTS orders (
     ticket_id INT REFERENCES ticket_catalogue(id) NOT NULL
 );
 
-INSERT INTO ticket_catalogue (ticket_type, price, zones, minimum_age, maximum_age, duration) VALUES ('ordinal', 2.50, 'ABC', 0, 100, 1);
-INSERT INTO ticket_catalogue (ticket_type, price, zones, minimum_age, maximum_age, duration) VALUES ('weekend pass', 3.50, 'ABC', 0, 27, 48);
+INSERT INTO ticket_catalogue (ticket_type, price, zones, minimum_age, maximum_age, duration, only_weekends) VALUES ('classic pass', 2.50, 'ABC', 0, 100, 1, false);
+INSERT INTO ticket_catalogue (ticket_type, price, zones, minimum_age, maximum_age, duration, only_weekends) VALUES ('weekend pass', 3.50, 'ABC', 0, 27, 48, true);
 
-/*
-Initializing the orders table causes errors inserting a new order in the db (duplicate id)
-
-INSERT INTO orders VALUES (1, 5, 'PENDING', 'MarioRossi', 1);
-INSERT INTO orders VALUES (2, 3, 'PENDING', 'JohnDoe', 2);
-INSERT INTO orders VALUES (3, 1, 'PENDING', 'MarioRossi', 3);
-INSERT INTO orders VALUES (4, 1, 'PENDING', 'Pietro', 4);
-*/
+INSERT INTO orders (quantity, status, username, ticket_id) VALUES (2, 'PENDING', 'admin', 1);
+INSERT INTO orders (quantity, status, username, ticket_id) VALUES (3, 'PENDING', 'admin', 2);
+INSERT INTO orders (quantity, status, username, ticket_id) VALUES (2, 'PENDING', 'admin', 1);
+INSERT INTO orders (quantity, status, username, ticket_id) VALUES (1, 'PENDING', 'admin', 2);

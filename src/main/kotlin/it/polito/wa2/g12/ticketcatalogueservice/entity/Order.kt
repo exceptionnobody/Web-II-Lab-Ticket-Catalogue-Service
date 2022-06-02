@@ -20,4 +20,4 @@ class Order(
     var id: Long? = null
 }
 
-fun Order.toDTO() = OrderDTO(quantity, status, username, ticketId)
+fun Order.toDTO() = OrderDTO(id!!, quantity, status, username, ticketId)
