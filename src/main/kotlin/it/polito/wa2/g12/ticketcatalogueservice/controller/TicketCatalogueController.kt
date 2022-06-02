@@ -14,8 +14,7 @@ import java.security.Principal
 class TicketCatalogueController(val ticketCatalogueService: TicketCatalogueServiceImpl) {
 
     @GetMapping("/tickets")
-    @PreAuthorize("hasAnyAuthority('ADMIN','CUSTOMER')")
-    fun getAllCustomers() : Flow<TicketDTO> {
+    fun getAllTickets() : Flow<TicketDTO> {
         return ticketCatalogueService.getAllTickets()
     }
 
@@ -37,10 +36,10 @@ class TicketCatalogueController(val ticketCatalogueService: TicketCatalogueServi
         return ticketCatalogueService.getAllOrders()
     }
 
+    // We use the unique nickname of the user as userId
     @GetMapping("/admin/orders/{userId}")
     @PreAuthorize("hasAnyAuthority('ADMIN')")
     fun getAllUserOrders(@PathVariable userId: String): Flow<OrderDTO> {
-        //Todo "why userId is string?"
         return ticketCatalogueService.getAllUserOrders(userId)
     }
 
@@ -48,13 +47,11 @@ class TicketCatalogueController(val ticketCatalogueService: TicketCatalogueServi
     @PreAuthorize("hasAnyAuthority('ADMIN','CUSTOMER')")
     suspend fun shopTickets(
         @PathVariable ticketId: Long,
-        @RequestHeader
-        header: String,
-        @RequestBody
-        body: String,
+        @RequestHeader header: String,
+        @RequestBody body: String,
         br: BindingResult,
-        principal: Principal): Any {
-        // Usually an Id is a Long and not a String
+        principal: Principal
+    ): Any {
         println(header)
         return if (ticketCatalogueService.shopTickets(principal.name, ticketId, 2, PaymentInfo("cardNumber", "expiration", 0, "cardholder"),
                 "Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhZG1pbiIsImV4cCI6MTY1NzYwOTQ3MCwiaWF0IjoxNjU0MDA5NDcwLCJyb2xlcyI6WyJBRE1JTiIsIkNVU1RPTUVSIl19.3PlWqpH-Y_xqNvAKWXmRY3ZqVzm8JAOKONQat6PLILo"))

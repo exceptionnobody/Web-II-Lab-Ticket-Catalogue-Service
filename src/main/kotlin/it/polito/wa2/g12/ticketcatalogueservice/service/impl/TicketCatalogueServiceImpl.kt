@@ -18,7 +18,6 @@ import org.springframework.web.reactive.function.client.awaitBody
 import java.time.LocalDate
 import kotlin.math.absoluteValue
 
-
 // TODO: use this guide to pass from webflux to coroutine
 // https://www.baeldung.com/kotlin/spring-boot-kotlin-coroutines
 

@@ -12,25 +12,28 @@ import org.springframework.stereotype.Service
 import java.util.*
 
 @Service
-class JwtUtils(@Value("\${jwt.key}") private val key: String) {
+class JwtUtils(@Value("\${jwt.secret-key}") private val key: String) {
 
-    private val parser: JwtParser =
-        Jwts.parserBuilder().setSigningKey(Keys.hmacShaKeyFor(Decoders.BASE64.decode(key))).build()
+    private val parser: JwtParser = Jwts
+        .parserBuilder()
+        .setSigningKey(Keys.hmacShaKeyFor(Decoders.BASE64.decode(key)))
+        .build()
 
     fun validateJwt(authToken: String): Boolean {
-
         try {
             val body = parser.parseClaimsJws(authToken).body
-
-            val ruoli = listOf("CUSTOMER", "ADMIN")
+            val roles = listOf("CUSTOMER", "ADMIN")
             val userId = body.getValue("sub").toString()
-            val role = body["roles"].toString().replace("[", "").replace("]", "").split(",")
+            val role = body["roles"]
+                .toString()
+                .replace("[", "")
+                .replace("]", "")
+                .split(",")
 
-            if (userId.isBlank() || role.isEmpty() || !(role.any { bItem -> ruoli.any { it.contains(bItem) } }))
+            if ( userId.isBlank() || role.isEmpty() ||
+                !(role.any { bItem -> roles.any { it.contains(bItem) } }) )
                 return false
-
             return true
-
         } catch (e: Exception) {
             return false
         }
