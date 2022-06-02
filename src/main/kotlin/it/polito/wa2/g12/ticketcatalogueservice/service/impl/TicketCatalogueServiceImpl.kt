@@ -13,8 +13,6 @@ import kotlinx.coroutines.flow.map
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.MediaType
 import org.springframework.stereotype.Service
-import org.springframework.util.LinkedMultiValueMap
-import org.springframework.util.MultiValueMap
 import org.springframework.web.reactive.function.BodyInserters
 import org.springframework.web.reactive.function.client.WebClient
 import org.springframework.web.reactive.function.client.awaitBody
@@ -92,7 +90,7 @@ class TicketCatalogueServiceImpl: TicketCatalogueService {
             return false
 
         if (isValidAge(ticket, response)) {
-            println("USER VALIDO"); // TODO: remove me
+            println("USER VALIDO") // TODO: remove me
 
             val newOrder = Order(paymentInfo.quantity, "PENDING", username, paymentInfo.ticket_id)
             orderRepository.save(newOrder)
@@ -165,7 +163,7 @@ class TicketCatalogueServiceImpl: TicketCatalogueService {
 
             return true
         } else {
-            println("USER NON VALIDO"); // TODO: remove me
+            println("USER NON VALIDO") // TODO: remove me
             return false
         }
     }
