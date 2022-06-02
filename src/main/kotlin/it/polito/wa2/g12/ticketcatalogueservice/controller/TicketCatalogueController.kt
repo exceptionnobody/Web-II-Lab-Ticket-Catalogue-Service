@@ -1,7 +1,7 @@
 package it.polito.wa2.g12.ticketcatalogueservice.controller
 
 import it.polito.wa2.g12.ticketcatalogueservice.dto.OrderDTO
-import it.polito.wa2.g12.ticketcatalogueservice.dto.PaymentCardDTO
+import it.polito.wa2.g12.ticketcatalogueservice.dto.PaymentInfoDTO
 import it.polito.wa2.g12.ticketcatalogueservice.dto.TicketDTO
 import it.polito.wa2.g12.ticketcatalogueservice.service.impl.TicketCatalogueServiceImpl
 import kotlinx.coroutines.flow.Flow
@@ -55,25 +55,16 @@ class TicketCatalogueController(val ticketCatalogueService: TicketCatalogueServi
     suspend fun shopTickets(
         @PathVariable ticketId: Long,
         @RequestHeader("Authorization") authorizationHeader: String,
-        @RequestBody body: String,
-        //br: BindingResult,
+        @RequestBody paymentInfo: PaymentInfoDTO,
         principal: Principal
     ): String {
         println(authorizationHeader) // TODO: remove me
-        return if (
-            ticketCatalogueService
-                .shopTickets(
+        return if (ticketCatalogueService.shopTickets(
                     principal.name,
-                    ticketId,
-                    2,
-                    PaymentCardDTO(
-                        "cardNumber",
-                        "expiration",
-                        0,
-                        "cardholder"
-                    ),
-                    authorizationHeader))
-            "Ok"
-        else "You're not able to buy this kind of ticket"
+                    paymentInfo,
+                    authorizationHeader
+                ))
+            "Your tickets have been purchased"
+        else "You can't buy this kind of ticket"
     }
 }

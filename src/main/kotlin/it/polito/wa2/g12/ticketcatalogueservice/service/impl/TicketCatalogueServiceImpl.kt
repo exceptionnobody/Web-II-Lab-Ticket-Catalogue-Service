@@ -1,5 +1,6 @@
 package it.polito.wa2.g12.ticketcatalogueservice.service.impl
 
+import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import it.polito.wa2.g12.ticketcatalogueservice.dto.*
 import it.polito.wa2.g12.ticketcatalogueservice.entity.Order
 import it.polito.wa2.g12.ticketcatalogueservice.entity.Ticket
@@ -12,6 +13,9 @@ import kotlinx.coroutines.flow.map
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.MediaType
 import org.springframework.stereotype.Service
+import org.springframework.util.LinkedMultiValueMap
+import org.springframework.util.MultiValueMap
+import org.springframework.web.reactive.function.BodyInserters
 import org.springframework.web.reactive.function.client.WebClient
 import org.springframework.web.reactive.function.client.awaitBody
 import java.time.LocalDate
@@ -71,8 +75,8 @@ class TicketCatalogueServiceImpl: TicketCatalogueService {
         return age <= ticket.maximum_age && age >= ticket.minimum_age
     }
 
-    override suspend fun shopTickets(username: String, ticketdId: Long, quantity: Int, paymentInfo: PaymentCardDTO, jwt: String): Boolean {
-        val ticket: TicketDTO? = ticketRepository.findById(ticketdId)?.toDTO()
+    override suspend fun shopTickets(username: String, paymentInfo: PaymentInfoDTO, jwt: String): Boolean {
+        val ticket: TicketDTO? = ticketRepository.findById(paymentInfo.ticket_id)?.toDTO()
         val response: UserProfileDTO = WebClient
             .create("http://localhost:8081")
             .get()
@@ -83,12 +87,6 @@ class TicketCatalogueServiceImpl: TicketCatalogueService {
             .awaitBody()
         println(response) // TODO: remove me
 
-/*
-        val ob = jacksonObjectMapper()
-        val om = jacksonObjectMapper()
-        val userDet = ob.readValue(response, UserDet::class.java)
-*/
-
         // Ticket not found
         if (ticket == null)
             return false
@@ -96,8 +94,8 @@ class TicketCatalogueServiceImpl: TicketCatalogueService {
         if (isValidAge(ticket, response)) {
             println("USER VALIDO"); // TODO: remove me
 
-            orderRepository.save(Order(quantity, "PENDING", username, ticketdId))
-            Order(quantity, "PENDING", username, ticketdId).toDTO()
+            val newOrder = Order(paymentInfo.quantity, "PENDING", username, paymentInfo.ticket_id)
+            orderRepository.save(newOrder)
 
             // THE CODE BELOW MUST BE CHANGED:
 
@@ -108,6 +106,8 @@ class TicketCatalogueServiceImpl: TicketCatalogueService {
             // updated according to what the payment service has stated and, if the operation was
             // successful, the purchased products are added to the list of acquired tickets in the
             // TravellerService."
+
+            // START KAFKA STUFF
 
             /*
             // Contacts the payment service
@@ -135,6 +135,33 @@ class TicketCatalogueServiceImpl: TicketCatalogueService {
                     .awaitBody<String>()
             }
             */
+
+            // END KAFKA STUFF
+
+            // Creates body for the request
+            val ticketsToAcquire = TicketsToAcquireDTO(
+                ticket.ticket_type,
+                paymentInfo.quantity,
+                ticket.zones,
+                ticket.duration,
+                ticket.only_weekends,
+                username
+            )
+            val mapper = jacksonObjectMapper()
+            val body = mapper.writeValueAsString(ticketsToAcquire)
+
+            // Sends the request to generate the tickets
+            val acquiredTickets: List<AcquiredTicketDTO> = WebClient
+                .create("http://localhost:8081")
+                .post()
+                .uri("/my/tickets/acquired")
+                .header("Authorization", jwt)
+                .accept(MediaType.APPLICATION_JSON)
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(BodyInserters.fromValue(body))
+                .retrieve()
+                .awaitBody()
+            println(acquiredTickets) // TODO: remove me
 
             return true
         } else {
