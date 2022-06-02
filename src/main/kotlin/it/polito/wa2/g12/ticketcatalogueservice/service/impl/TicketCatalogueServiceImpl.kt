@@ -1,8 +1,9 @@
 package it.polito.wa2.g12.ticketcatalogueservice.service.impl
 
-import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import it.polito.wa2.g12.ticketcatalogueservice.dto.OrderDTO
+import it.polito.wa2.g12.ticketcatalogueservice.dto.PaymentInfoDTO
 import it.polito.wa2.g12.ticketcatalogueservice.dto.TicketDTO
+import it.polito.wa2.g12.ticketcatalogueservice.dto.UserProfileDTO
 import it.polito.wa2.g12.ticketcatalogueservice.entity.Order
 import it.polito.wa2.g12.ticketcatalogueservice.entity.toDTO
 import it.polito.wa2.g12.ticketcatalogueservice.repository.OrderRepository
@@ -16,7 +17,9 @@ import org.springframework.stereotype.Service
 import org.springframework.web.reactive.function.client.WebClient
 import org.springframework.web.reactive.function.client.awaitBody
 import java.time.LocalDate
+import java.util.*
 import kotlin.math.absoluteValue
+
 
 // TODO: use this guide to pass from webflux to coroutine
 // https://www.baeldung.com/kotlin/spring-boot-kotlin-coroutines
@@ -48,57 +51,90 @@ class TicketCatalogueServiceImpl: TicketCatalogueService {
         return orderRepository.findUserOrderById(username, orderId)?.toDTO()
     }
 
-    private fun isValidUser(ticket: TicketDTO, user: UserDet): Boolean {
+    private fun isValidUser(ticket: TicketDTO, profile: UserProfileDTO): Boolean {
+        val calendar = Calendar.getInstance()
+        calendar.time = profile.date_of_birth
         val localTime = LocalDate.now()
+
         return if (ticket.ticket_type != "ordinal"){
             when (ticket.ticket_type) {
-                "under 18" -> (LocalDate.parse(user.date_of_birth).year - localTime.year).absoluteValue <= 18
-                "over 60" -> (LocalDate.parse(user.date_of_birth).year - localTime.year).absoluteValue >= 60
+                "under 18" -> (calendar.get(Calendar.YEAR) - localTime.year).absoluteValue <= 18
+                "over 60" -> (calendar.get(Calendar.YEAR) - localTime.year).absoluteValue >= 60
                 else -> true
             }
         } else true
     }
 
-    override suspend fun shopTickets(username: String, ticketdId: Long, quantity: Int, paymentInfo: PaymentInfo, jwt: String): Boolean {
+    override suspend fun shopTickets(username: String, ticketdId: Long, quantity: Int, paymentInfo: PaymentInfoDTO, jwt: String): Boolean {
         val ticket: TicketDTO? = ticketRepository.findById(ticketdId)?.toDTO()
-
-        val response: String = WebClient.create("http://localhost:8081").get().uri("/my/profile")
+        val response: UserProfileDTO = WebClient
+            .create("http://localhost:8081")
+            .get()
+            .uri("/my/profile")
             .header("Authorization", jwt)
             .accept(MediaType.APPLICATION_JSON)
-            .retrieve().awaitBody()
+            .retrieve()
+            .awaitBody()
+        println(response) // TODO: remove me
 
+/*
         val ob = jacksonObjectMapper()
         val om = jacksonObjectMapper()
         val userDet = ob.readValue(response, UserDet::class.java)
+*/
 
-        if (ticket != null) {
-            if (isValidUser(ticket, userDet)){
-                orderRepository.save(Order(quantity, "PENDING", username, ticketdId))
-                Order(quantity, "PENDING", username, ticketdId).toDTO()
-                //contact the payment service
-                //if success, contact the traveler service, to store the new tickets
-                /*val paymentResponse: String = WebClient.create("http://localhost:/porta del payment service").post().uri("endpoint payment service controller")
-                    //.header() settare header
-                    //.body() settare body
-                    .accept(MediaType.APPLICATION_JSON)
-                    .retrieve().awaitBody()
-                if ("payment ok") {
-                    //update order status
-                    val pendingOrder = orderRepository.findAllUserOrders(username).filter { it.status == "PENDING" && it.ticketId == ticketdId }.first()
-                    pendingOrder.status = "PAYED"
+        // Ticket not found
+        if (ticket == null)
+            return false
 
-                    //contacting traveler service to create new tickets
-                    val postTicketResponse: String = WebClient.create("http://localhost:8081").post().uri("/my/profile")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .header("Authorization", jwt)
-                        .bodyValue(om.writeValueAsString(AddingTicketReq("buy_tickets", quantity, ticket.zone)))
-                        .retrieve()
-                        .awaitBody<String>()
+        if (isValidUser(ticket, response)) {
+            println("USER VALIDO"); // TODO: remove me
 
-                }*/
-            } else return false
+            orderRepository.save(Order(quantity, "PENDING", username, ticketdId))
+            Order(quantity, "PENDING", username, ticketdId).toDTO()
+
+            // THE CODE BELOW MUST BE CHANGED:
+
+            // CONSEGNA:
+            // "it transmits the billing information and the total cost of the
+            // order to the payment service through a kafka topic, and it returns the orderId. When
+            // the Kafka listener receives the outcome of the transaction, the status of order is
+            // updated according to what the payment service has stated and, if the operation was
+            // successful, the purchased products are added to the list of acquired tickets in the
+            // TravellerService."
+
+            /*
+            // Contacts the payment service
+            // If succeeded, contacts the traveler service to store the new tickets
+            val paymentResponse: String = WebClient
+                .create("http://localhost:/porta del payment service")
+                .post()
+                .uri("endpoint payment service controller")
+                //.header() settare header
+                //.body() settare body
+                .accept(MediaType.APPLICATION_JSON)
+                .retrieve().awaitBody()
+
+            if ("payment ok") {
+                //update order status
+                val pendingOrder = orderRepository.findAllUserOrders(username).filter { it.status == "PENDING" && it.ticketId == ticketdId }.first()
+                pendingOrder.status = "PAYED"
+
+                //contacting traveler service to create new tickets
+                val postTicketResponse: String = WebClient.create("http://localhost:8081").post().uri("/my/profile")
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .header("Authorization", jwt)
+                    .bodyValue(om.writeValueAsString(AddingTicketReq("buy_tickets", quantity, ticket.zone)))
+                    .retrieve()
+                    .awaitBody<String>()
+            }
+            */
+
+            return true
+        } else {
+            println("USER NON VALIDO"); // TODO: remove me
+            return false
         }
-        return true
     }
 }
 //
