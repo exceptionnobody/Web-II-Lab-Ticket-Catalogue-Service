@@ -10,5 +10,6 @@ interface TicketCatalogueService {
     fun getAllOrders(): Flow<OrderDTO>
     fun getAllUserOrders(username: String): Flow<OrderDTO>
     suspend fun getUserOrder(username: String, orderId: Long): OrderDTO?
+    suspend fun addNewTicket(t: TicketDTO): TicketDTO?
     suspend fun shopTickets(username: String, ticketdId: Long, quantity: Int, paymentInfo: PaymentInfoDTO, jwt: String): Boolean
 }

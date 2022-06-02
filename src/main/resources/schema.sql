@@ -3,9 +3,12 @@ DROP TABLE IF EXISTS orders CASCADE;
 
 CREATE TABLE IF NOT EXISTS ticket_catalogue (
     id SERIAL PRIMARY KEY,
-    price NUMERIC(6,2),
-    ticket_type VARCHAR(255),
-    zone VARCHAR(255)
+    ticket_type VARCHAR(255) NOT NULL,
+    price NUMERIC(6,2) NOT NULL,
+    zones VARCHAR(255) NOT NULL,
+    minimum_age INT NOT NULL,
+    maximum_age INT NOT NULL,
+    duration INT NOT NULL
 );
 
 CREATE TABLE IF NOT EXISTS orders (
@@ -16,12 +19,8 @@ CREATE TABLE IF NOT EXISTS orders (
     ticket_id INT REFERENCES ticket_catalogue(id) NOT NULL
 );
 
-INSERT INTO ticket_catalogue VALUES (1, 2.50, 'ordinal', 'Zone 1');
-INSERT INTO ticket_catalogue VALUES (2, 3.52, 'weekend pass', 'Zone 2');
-INSERT INTO ticket_catalogue VALUES (3, 12.65, 'under 18', 'Zone 4');
-INSERT INTO ticket_catalogue VALUES (4, 1.51, 'ordinal', 'Zone 4');
-INSERT INTO ticket_catalogue VALUES (5, 36.52, 'ordinal', 'Zone 3');
-INSERT INTO ticket_catalogue VALUES (6, 65.53, 'over 60', 'Zone 2');
+INSERT INTO ticket_catalogue (ticket_type, price, zones, minimum_age, maximum_age, duration) VALUES ('ordinal', 2.50, 'ABC', 0, 100, 1);
+INSERT INTO ticket_catalogue (ticket_type, price, zones, minimum_age, maximum_age, duration) VALUES ('weekend pass', 3.50, 'ABC', 0, 27, 48);
 
 /*
 Initializing the orders table causes errors inserting a new order in the db (duplicate id)

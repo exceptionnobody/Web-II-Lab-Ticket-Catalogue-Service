@@ -42,6 +42,14 @@ class TicketCatalogueController(val ticketCatalogueService: TicketCatalogueServi
         return ticketCatalogueService.getAllUserOrders(userId)
     }
 
+    // Use a JSON like this one to test this endpoint:
+    // {"price":"20", "ticket_type":"ordinal", "zones":"XYZ", "minimum_age":18, "maximum_age":30, "duration":"24"}
+    @PostMapping("/admin/tickets")
+    @PreAuthorize("hasAnyAuthority('ADMIN')")
+    suspend fun addNewTicket(@RequestBody ticket: TicketDTO): TicketDTO? {
+        return ticketCatalogueService.addNewTicket(ticket)
+    }
+
     @PostMapping("/shop/{ticketId}")
     @PreAuthorize("hasAnyAuthority('ADMIN','CUSTOMER')")
     suspend fun shopTickets(

@@ -1,10 +1,8 @@
 package it.polito.wa2.g12.ticketcatalogueservice.service.impl
 
-import it.polito.wa2.g12.ticketcatalogueservice.dto.OrderDTO
-import it.polito.wa2.g12.ticketcatalogueservice.dto.PaymentInfoDTO
-import it.polito.wa2.g12.ticketcatalogueservice.dto.TicketDTO
-import it.polito.wa2.g12.ticketcatalogueservice.dto.UserProfileDTO
+import it.polito.wa2.g12.ticketcatalogueservice.dto.*
 import it.polito.wa2.g12.ticketcatalogueservice.entity.Order
+import it.polito.wa2.g12.ticketcatalogueservice.entity.Ticket
 import it.polito.wa2.g12.ticketcatalogueservice.entity.toDTO
 import it.polito.wa2.g12.ticketcatalogueservice.repository.OrderRepository
 import it.polito.wa2.g12.ticketcatalogueservice.repository.TicketRepository
@@ -24,9 +22,9 @@ import kotlin.math.absoluteValue
 // TODO: use this guide to pass from webflux to coroutine
 // https://www.baeldung.com/kotlin/spring-boot-kotlin-coroutines
 
-data class PaymentInfo(val cardNumber: String, val exp: String, val cvv: Int, val cardHolder: String)
-private data class UserDet(val name: String, val address: String, val date_of_birth: String, val number: String)
-private data class AddingTicketReq(val cmd: String, val quantity: Int, val zones: String)
+//data class PaymentInfo(val cardNumber: String, val exp: String, val cvv: Int, val cardHolder: String)
+//private data class UserDet(val name: String, val address: String, val date_of_birth: String, val number: String)
+//private data class AddingTicketReq(val cmd: String, val quantity: Int, val zones: String)
 
 @Service
 class TicketCatalogueServiceImpl: TicketCatalogueService {
@@ -51,18 +49,25 @@ class TicketCatalogueServiceImpl: TicketCatalogueService {
         return orderRepository.findUserOrderById(username, orderId)?.toDTO()
     }
 
-    private fun isValidUser(ticket: TicketDTO, profile: UserProfileDTO): Boolean {
+    override suspend fun addNewTicket(t: TicketDTO): TicketDTO? {
+        return ticketRepository.save(
+            Ticket(
+                t.ticket_type,
+                t.price,
+                t.zones,
+                t.minimum_age,
+                t.maximum_age,
+                t.duration
+        )).toDTO()
+    }
+
+    private fun isValidAge(ticket: TicketDTO, profile: UserProfileDTO): Boolean {
         val calendar = Calendar.getInstance()
-        calendar.time = profile.date_of_birth
         val localTime = LocalDate.now()
 
-        return if (ticket.ticket_type != "ordinal"){
-            when (ticket.ticket_type) {
-                "under 18" -> (calendar.get(Calendar.YEAR) - localTime.year).absoluteValue <= 18
-                "over 60" -> (calendar.get(Calendar.YEAR) - localTime.year).absoluteValue >= 60
-                else -> true
-            }
-        } else true
+        calendar.time = profile.date_of_birth
+        val age = (calendar.get(Calendar.YEAR) - localTime.year).absoluteValue
+        return age <= ticket.maximum_age && age >= ticket.minimum_age
     }
 
     override suspend fun shopTickets(username: String, ticketdId: Long, quantity: Int, paymentInfo: PaymentInfoDTO, jwt: String): Boolean {
@@ -87,7 +92,7 @@ class TicketCatalogueServiceImpl: TicketCatalogueService {
         if (ticket == null)
             return false
 
-        if (isValidUser(ticket, response)) {
+        if (isValidAge(ticket, response)) {
             println("USER VALIDO"); // TODO: remove me
 
             orderRepository.save(Order(quantity, "PENDING", username, ticketdId))
