@@ -23,7 +23,8 @@ CREATE TABLE IF NOT EXISTS orders (
 INSERT INTO ticket_catalogue (ticket_type, price, zones, minimum_age, maximum_age, duration, only_weekends) VALUES ('classic pass', 2.50, 'ABC', 0, 100, 1, false);
 INSERT INTO ticket_catalogue (ticket_type, price, zones, minimum_age, maximum_age, duration, only_weekends) VALUES ('weekend pass', 3.50, 'ABC', 0, 27, 48, true);
 
-INSERT INTO orders (quantity, status, username, ticket_id) VALUES (2, 'PENDING', 'admin', 1);
-INSERT INTO orders (quantity, status, username, ticket_id) VALUES (3, 'PENDING', 'admin', 2);
-INSERT INTO orders (quantity, status, username, ticket_id) VALUES (2, 'PENDING', 'admin', 1);
-INSERT INTO orders (quantity, status, username, ticket_id) VALUES (1, 'PENDING', 'admin', 2);
+INSERT INTO orders (quantity, status, username, ticket_id) VALUES (2, 'SUCCESS', 'admin', 1);
+INSERT INTO orders (quantity, status, username, ticket_id) VALUES (3, 'SUCCESS', 'admin', 2);
+INSERT INTO orders (quantity, status, username, ticket_id) VALUES (2, 'FAILURE', 'admin', 1);
+INSERT INTO orders (quantity, status, username, ticket_id) VALUES (1, 'FAILURE', 'admin', 2);
+INSERT INTO orders (quantity, status, username, ticket_id) VALUES (1, 'FAILURE', 'test', 1);
