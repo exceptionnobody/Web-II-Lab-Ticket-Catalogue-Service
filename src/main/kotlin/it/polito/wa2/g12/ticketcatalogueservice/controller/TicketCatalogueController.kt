@@ -50,21 +50,17 @@ class TicketCatalogueController(val ticketCatalogueService: TicketCatalogueServi
         return ticketCatalogueService.addNewTicket(ticket)
     }
 
-    @PostMapping("/shop/{ticketId}")
+    @PostMapping("/shop")
     @PreAuthorize("hasAnyAuthority('ADMIN','CUSTOMER')")
     suspend fun shopTickets(
-        @PathVariable ticketId: Long,
         @RequestHeader("Authorization") authorizationHeader: String,
         @RequestBody paymentInfo: PaymentInfoDTO,
         principal: Principal
-    ): String {
-        println(authorizationHeader) // TODO: remove me
-        return if (ticketCatalogueService.shopTickets(
+    ): OrderDTO {
+        return ticketCatalogueService.shopTickets(
                     principal.name,
                     paymentInfo,
                     authorizationHeader
-                ))
-            "Your tickets have been purchased"
-        else "You can't buy this kind of ticket"
+                )
     }
 }

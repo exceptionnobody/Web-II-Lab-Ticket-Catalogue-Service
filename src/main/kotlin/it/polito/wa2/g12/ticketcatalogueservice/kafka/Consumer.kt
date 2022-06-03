@@ -28,7 +28,6 @@ class Consumer {
     lateinit var orderRepository: OrderRepository
     @KafkaListener(topics = ["\${kafka.topics.transaction}"], groupId = "ppr")
     fun paymentListener(consumerRecord: ConsumerRecord<Any, Any>, ack: Acknowledgment) {
-        println("Message received $consumerRecord")
         val message = consumerRecord.value() as TransactionMessage
         if(message.status == "FAILURE")
         {
@@ -71,7 +70,8 @@ class Consumer {
                 orderRepository.save(order)
                 acquiredTickets
             }.subscribe{
-                print(it) //TODO: REMOVE ME
+                // print tickets acquired for debug purposes
+                println(it)
                 ack.acknowledge()
             }
         }
