@@ -11,4 +11,6 @@ data class TransactionMessage(
     val status: String,
     @JsonProperty("username")
     val username: String,
+    @JsonProperty("jwt")
+    val jwt: String,
 )

@@ -18,4 +18,7 @@ data class BillingMessage(
     val card_holder: String,
     @JsonProperty("username")
     val username: String,
+    @JsonProperty("jwt")
+    val jwt: String,
+
 )
